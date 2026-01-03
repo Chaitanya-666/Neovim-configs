@@ -67,7 +67,7 @@ return {
       end
 
       mason_lspconfig.setup({
-        ensure_installed = { "lua_ls", "tsserver", "pyright" },
+        ensure_installed = { "lua_ls", "tsserver", "pyright", "cpptools" },
       })
 
       mason_lspconfig.setup_handlers({

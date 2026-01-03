@@ -1,36 +1,71 @@
 -- ~/.config/nvim/lua/guide.lua
 
--- This is your personal guidebook for your Neovim configuration.
--- You can add any information you want here, such as:
---
--- * Explanations of your configuration choices
--- * A list of your custom keymappings
--- * Notes on how to use your plugins
---
--- To open this guidebook, use the command `:UserGuide`.
+local M = {}
 
--- Keymappings
---
--- <leader>e - Toggle file explorer
--- <leader>ff - Find files
--- <leader>fs - Live grep
--- <leader>fb - Find buffers
--- <leader>fh - Help tags
+function M.show_guide()
+  local lines = {
+    "~ My Neovim Keymap Guide ~",
+    "",
+    " General",
+    "  <Space>       - Leader Key",
+    "  :q            - Quit",
+    "  :w            - Write (Save)",
+    "  :wq           - Write & Quit",
+    "",
+    " File Explorer (NvimTree)",
+    "  <Space>e      - Toggle File Explorer",
+    "  c             - Change Directory to selected folder",
+    "  a             - Add file/folder",
+    "  r             - Rename",
+    "  d             - Delete",
+    "",
+    " Super Search (Telescope)",
+    "  <Space>ff     - Find Files",
+    "  <Space>fs     - Find Text in Project (Grep)",
+    "  <Space>fb     - Find Buffers (Open Files)",
+    "  <Space>fh     - Find Help Tags",
+    "",
+    " Debugging (DAP)",
+    "  <F5>          - Start/Continue Debugging",
+    "  <F10>         - Step Over",
+    "  <F11>         - Step Into",
+    "  <F12>         - Step Out",
+    "  <Space>b      - Toggle Breakpoint",
+    "  <Space>dr     - Toggle Debugger UI",
+    "",
+    " Editing",
+    "  yy, dd, p     - Yank, Delete, Paste",
+    "  v + motion    - Visually select, then 'd' or 'y'",
+    "  u / <C-r>     - Undo / Redo",
+  }
 
--- Plugins
---
--- * folke/tokyonight.nvim - Colorscheme
--- * nvim-lualine/lualine.nvim - Statusline
--- * neovim/nvim-lspconfig - LSP configuration
--- * williamboman/mason.nvim - LSP installer
--- * williamboman/mason-lspconfig.nvim - Bridge between mason and lspconfig
--- * hrsh7th/nvim-cmp - Autocompletion
--- * hrsh7th/cmp-buffer - Autocompletion source for buffers
--- * hrsh7th/cmp-path - Autocompletion source for paths
--- * L3MON4D3/LuaSnip - Snippet engine
--- * saadparwaiz1/cmp_luasnip - Bridge between nvim-cmp and LuaSnip
--- * nvim-tree/nvim-tree.lua - File explorer
--- * nvim-tree/nvim-web-devicons - Icons for nvim-tree and lualine
--- * xiyaowong/transparent.nvim - Transparency
--- * nvim-telescope/telescope.nvim - Fuzzy finder
--- * nvim-lua/plenary.nvim - Dependency for telescope
+  -- Create a new buffer
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
+  -- Set buffer options
+  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+  vim.api.nvim_buf_set_option(buf, "filetype", "markdown")
+  vim.api.nvim_buf_set_option(buf, "readonly", true)
+
+  -- Calculate floating window dimensions
+  local width = vim.api.nvim_get_option("columns")
+  local height = vim.api.nvim_get_option("lines")
+  local win_width = math.floor(width * 0.6)
+  local win_height = #lines + 2
+  local row = math.floor((height - win_height) / 2)
+  local col = math.floor((width - win_width) / 2)
+
+  -- Create a floating window
+  local win = vim.api.nvim_open_win(buf, true, {
+    relative = "editor",
+    width = win_width,
+    height = win_height,
+    row = row,
+    col = col,
+    style = "minimal",
+    border = "rounded",
+  })
+end
+
+return M

@@ -12,3 +12,11 @@ vim.api.nvim_create_user_command('Profile', function()
     vim.cmd("e startup.log")
   end
 end, {})
+
+-- Command to show the keymap guide
+vim.api.nvim_create_user_command('KeymapGuide', function()
+  require('guide').show_guide()
+end, {})
+
+-- Keymap to open the guide
+vim.keymap.set('n', '<leader>g', '<cmd>KeymapGuide<cr>', { noremap = true, silent = true, desc = "Show keymap guide" })
