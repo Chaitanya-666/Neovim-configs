@@ -1,0 +1,36 @@
+-- ~/.config/nvim/lua/guide.lua
+
+-- This is your personal guidebook for your Neovim configuration.
+-- You can add any information you want here, such as:
+--
+-- * Explanations of your configuration choices
+-- * A list of your custom keymappings
+-- * Notes on how to use your plugins
+--
+-- To open this guidebook, use the command `:UserGuide`.
+
+-- Keymappings
+--
+-- <leader>e - Toggle file explorer
+-- <leader>ff - Find files
+-- <leader>fs - Live grep
+-- <leader>fb - Find buffers
+-- <leader>fh - Help tags
+
+-- Plugins
+--
+-- * folke/tokyonight.nvim - Colorscheme
+-- * nvim-lualine/lualine.nvim - Statusline
+-- * neovim/nvim-lspconfig - LSP configuration
+-- * williamboman/mason.nvim - LSP installer
+-- * williamboman/mason-lspconfig.nvim - Bridge between mason and lspconfig
+-- * hrsh7th/nvim-cmp - Autocompletion
+-- * hrsh7th/cmp-buffer - Autocompletion source for buffers
+-- * hrsh7th/cmp-path - Autocompletion source for paths
+-- * L3MON4D3/LuaSnip - Snippet engine
+-- * saadparwaiz1/cmp_luasnip - Bridge between nvim-cmp and LuaSnip
+-- * nvim-tree/nvim-tree.lua - File explorer
+-- * nvim-tree/nvim-web-devicons - Icons for nvim-tree and lualine
+-- * xiyaowong/transparent.nvim - Transparency
+-- * nvim-telescope/telescope.nvim - Fuzzy finder
+-- * nvim-lua/plenary.nvim - Dependency for telescope
