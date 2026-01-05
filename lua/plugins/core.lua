@@ -19,23 +19,23 @@ return {
   },
 
   -- Syntax Highlighting
-  -- {
-  --   "nvim-treesitter/nvim-treesitter",
-  --   build = ":TSUpdate",
-  --   lazy = false,
-  --   event = "VimEnter",
-  --   dependencies = {
-  --     "nvim-treesitter/nvim-treesitter-textobjects",
-  --   },
-  --   config = function()
-  --     require("nvim-treesitter.configs").setup({
-  --       ensure_installed = { "c", "lua", "vim", "vimdoc", "javascript", "typescript", "python", "rust", "go", "bash" },
-  --       highlight = { enable = true },
-  --       indent = { enable = true },
-  --     })
-  --     vim.cmd("TSUpdate")
-  --   end,
-  -- },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    lazy = false,
+    event = "VimEnter",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-textobjects",
+    },
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        ensure_installed = { "c", "lua", "vim", "vimdoc", "javascript", "typescript", "python", "rust", "go", "bash" },
+        highlight = { enable = true },
+        indent = { enable = true },
+      })
+      vim.cmd("TSUpdate")
+    end,
+  },
 
   -- LSP
   {
@@ -54,16 +54,8 @@ return {
 
       -- This function runs when an LSP server attaches to a buffer.
       local on_attach = function(client, bufnr)
-        -- Only set up format on save if the server supports it
-        if client.supports_method("textDocument/formatting") then
-          vim.api.nvim_create_autocmd("BufWritePre", {
-            group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, {}),
-            buffer = bufnr,
-            callback = function()
-              vim.lsp.buf.format({ bufnr = bufnr })
-            end,
-          })
-        end
+        -- Keymaps can be defined here for LSP-related actions
+        -- Example: vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = bufnr })
       end
 
       mason_lspconfig.setup({
