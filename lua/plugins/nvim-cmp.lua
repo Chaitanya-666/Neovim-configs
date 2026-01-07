@@ -9,12 +9,17 @@ return {
     "L3MON4D3/LuaSnip",
     "saadparwaiz1/cmp_luasnip",
     "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-nvim-lua",
+    "rafamadriz/friendly-snippets", -- Snippet collection
     "onsails/lspkind.nvim", -- Dependency for icons
   },
   config = function()
     local cmp = require("cmp")
     local luasnip = require("luasnip")
     local lspkind = require("lspkind")
+
+    -- loads vscode style snippets from installed plugins (e.g. friendly-snippets)
+    require("luasnip.loaders.from_vscode").lazy_load()
 
     cmp.setup({
       snippet = {
@@ -25,6 +30,7 @@ return {
       -- Configure sources for completion
       sources = cmp.config.sources({
         { name = "nvim_lsp" },
+        { name = "nvim_lua" },
         { name = "luasnip" },
         { name = "buffer" },
         { name = "path" },

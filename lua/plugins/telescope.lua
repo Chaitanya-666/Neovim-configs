@@ -3,7 +3,22 @@
 return {
   'nvim-telescope/telescope.nvim',
   branch = '0.1.x',
-  dependencies = { 'nvim-lua/plenary.nvim' },
+  dependencies = {
+    'nvim-lua/plenary.nvim',
+    {
+      'nvim-telescope/telescope-fzf-native.nvim',
+      build = 'make',
+      config = function()
+        require('telescope').load_extension('fzf')
+      end,
+    },
+    {
+      'nvim-telescope/telescope-ui-select.nvim',
+      config = function()
+        require('telescope').load_extension('ui-select')
+      end,
+    },
+  },
   config = function()
     local telescope = require('telescope')
     local actions = require('telescope.actions')
@@ -35,6 +50,11 @@ return {
         },
         help_tags = {
           theme = "dropdown",
+        },
+      },
+      extensions = {
+        ['ui-select'] = {
+          require('telescope.themes').get_dropdown(),
         },
       },
     })
