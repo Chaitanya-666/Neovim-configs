@@ -10,6 +10,7 @@ return {
       -- UI for DAP
       {
         "rcarriga/nvim-dap-ui",
+        dependencies = { "nvim-neotest/nvim-nio" },
         config = function()
           local dapui = require("dapui")
           dapui.setup({
@@ -49,11 +50,14 @@ return {
       local dapui = require("dapui")
 
       -- C++ adapter
-      dap.adapters.cppdbg = {
-        id = "cppdbg",
-        type = "executable",
-        command = require("mason-registry").get_package("cpptools"):get_install_path() .. "/extension/debugAdapters/bin/OpenDebugAD7",
-      }
+      local has_mason_registry, mason_registry = pcall(require, "mason-registry")
+      if has_mason_registry and mason_registry.is_installed("cpptools") then
+        dap.adapters.cppdbg = {
+          id = "cppdbg",
+          type = "executable",
+          command = mason_registry.get_package("cpptools"):get_install_path() .. "/extension/debugAdapters/bin/OpenDebugAD7",
+        }
+      end
 
       -- C++ launch configuration
       dap.configurations.cpp = {

@@ -1,32 +1,34 @@
 -- ~/.config/nvim/lua/plugins/ui.lua
 
 return {
-  -- IDE-like tabline
+  -- Buffers
   {
     'akinsho/bufferline.nvim',
-    version = "v4.5.0",
+    version = "*",
     dependencies = 'nvim-tree/nvim-web-devicons',
     config = function()
       require("bufferline").setup({
         options = {
-          mode = "buffers", -- set to "tabs" if you want to use vim tabs
+          mode = "buffers",
           separator_style = "slant",
-          indicator = {
-            style = 'underline',
+          diagnostics = "nvim_lsp",
+          offsets = {
+            {
+              filetype = "NvimTree",
+              text = "File Explorer",
+              text_align = "left",
+              separator = true
+            }
           },
-          show_buffer_close_icons = true,
-          show_close_icon = true,
-          -- Use a smaller buffer number font
-          numbers = "buffer_id", 
-          -- Other options...
         }
       })
-      -- Keybindings for bufferline navigation
       vim.keymap.set('n', '<Tab>', '<Cmd>BufferLineCycleNext<CR>', { desc = 'Cycle to next buffer' })
       vim.keymap.set('n', '<S-Tab>', '<Cmd>BufferLineCyclePrev<CR>', { desc = 'Cycle to previous buffer' })
+      vim.keymap.set('n', '<leader>x', '<Cmd>bdelete<CR>', { desc = 'Close buffer' })
     end,
   },
-  -- Keybinding guide
+
+  -- Key binding help
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -34,10 +36,62 @@ return {
       vim.o.timeout = true
       vim.o.timeoutlen = 300
     end,
+    opts = {}
+  },
+
+  -- Indent guides
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
+    opts = {},
+    config = function()
+      require("ibl").setup({
+        scope = { enabled = false }, -- catppuccin handles this or separate scope plugin
+      })
+    end,
+  },
+
+  -- Better UI for vim.ui.select and input
+  {
+    "stevearc/dressing.nvim",
+    event = "VeryLazy",
+  },
+
+  -- Cmdline and notifications
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
     opts = {
-      -- your configuration comes here
-      -- or leave it empty to use the default settings
-      -- refer to the configuration section for more details
+      lsp = {
+        -- override markdown rendering so that **cmp** and other plugins use Treesitter
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true,
+        },
+      },
+      -- you can enable a preset for easier configuration
+      presets = {
+        bottom_search = true, -- use a classic bottom cmdline for search
+        command_palette = true, -- position the cmdline and popupmenu together
+        long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = false, -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false, -- add a border to hover docs and signature help
+      },
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
     }
+  },
+
+  -- Notifications (standalone config if needed, but Noice uses it)
+  {
+    "rcarriga/nvim-notify",
+    opts = {
+      timeout = 3000,
+      background_colour = "#000000",
+    },
   },
 }

@@ -7,20 +7,35 @@ return {
     require("nvim-tree").setup({
       view = {
         width = 30,
-        mappings = {
-          list = {
-            { key = "c", action = "cd" },
+        relativenumber = true,
+      },
+      renderer = {
+        indent_markers = {
+          enable = true,
+        },
+        icons = {
+          glyphs = {
+            folder = {
+              arrow_closed = "", -- arrow when folder is closed
+              arrow_open = "", -- arrow when folder is open
+            },
           },
         },
       },
-      renderer = {
-        group_empty = true,
+      actions = {
+        open_file = {
+          quit_on_open = true,
+        },
       },
       filters = {
-        dotfiles = true,
+        dotfiles = false,
         custom = { ".git", "node_modules", ".cache" },
       },
+      git = {
+        ignore = false,
+      }
     })
-    vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>')
+    
+    vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = "Toggle File Explorer" })
   end
 }

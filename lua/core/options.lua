@@ -1,19 +1,67 @@
 -- ~/.config/nvim/lua/core/options.lua
 
--- Set options
-vim.opt.number = true
-vim.opt.relativenumber = true
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
-vim.opt.smartindent = true
-vim.opt.termguicolors = true
-vim.opt.backup = false
-vim.opt.writebackup = false
-vim.opt.swapfile = false
-vim.opt.undofile = true
-vim.opt.updatetime = 100
-vim.opt.signcolumn = "yes"
-vim.opt.scrolloff = 8
-vim.opt.mouse = ""
+local opt = vim.opt
+
+-- Line numbers
+opt.number = true
+opt.relativenumber = true
+
+-- Indentation
+opt.tabstop = 2
+opt.softtabstop = 2
+opt.shiftwidth = 2
+opt.expandtab = true
+opt.smartindent = true
+
+-- Search
+opt.ignorecase = true
+opt.smartcase = true
+
+-- Appearance
+opt.termguicolors = true
+opt.signcolumn = "yes"
+opt.cursorline = true
+opt.scrolloff = 8
+opt.sidescrolloff = 8
+
+-- Clipboard
+-- Check if we are in Termux
+if os.getenv("TERMUX_VERSION") then
+  -- Termux clipboard integration
+  vim.g.clipboard = {
+    name = "termux-clipboard",
+    copy = {
+      ["+"] = "termux-clipboard-set",
+      ["*"] = "termux-clipboard-set",
+    },
+    paste = {
+      ["+"] = "termux-clipboard-get",
+      ["*"] = "termux-clipboard-get",
+    },
+    cache_enabled = 1,
+  }
+else
+  -- Standard clipboard integration
+  opt.clipboard = "unnamedplus"
+end
+
+-- Backups & Undo
+opt.backup = false
+opt.writebackup = false
+opt.swapfile = false
+opt.undofile = true
+opt.undolevels = 10000
+
+-- Behavior
+opt.updatetime = 200
+opt.timeoutlen = 300
+opt.splitbelow = true
+opt.splitright = true
+
+-- Folding (using Treesitter usually, but good defaults help)
+opt.foldmethod = "manual"
+opt.foldenable = false
+
+-- Global
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "

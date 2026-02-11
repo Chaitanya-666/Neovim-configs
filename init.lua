@@ -1,15 +1,11 @@
 -- ~/.config/nvim/init.lua
 
--- Load core options
-require('core.options')
-require('core.commands')
-require('core.performance')
-
--- Set <space> as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+-- Load core modules
+require("core.options")
+require("core.keymaps")
+require("core.autocmds")
+require("core.commands")
+require("core.performance")
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -28,7 +24,18 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Setup plugins
-require('lazy').setup('plugins')
+require('lazy').setup('plugins', {
+  ui = {
+    border = "rounded",
+  },
+  change_detection = {
+    notify = false,
+  },
+  checker = {
+    enabled = true,
+    notify = false,
+  }
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
