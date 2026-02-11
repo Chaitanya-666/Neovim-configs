@@ -52,11 +52,14 @@ return {
       -- C++ adapter
       local has_mason_registry, mason_registry = pcall(require, "mason-registry")
       if has_mason_registry and mason_registry.is_installed("cpptools") then
-        dap.adapters.cppdbg = {
-          id = "cppdbg",
-          type = "executable",
-          command = mason_registry.get_package("cpptools"):get_install_path() .. "/extension/debugAdapters/bin/OpenDebugAD7",
-        }
+        local cpptools = mason_registry.get_package("cpptools")
+        if cpptools and cpptools.get_install_path then
+          dap.adapters.cppdbg = {
+            id = "cppdbg",
+            type = "executable",
+            command = cpptools:get_install_path() .. "/extension/debugAdapters/bin/OpenDebugAD7",
+          }
+        end
       end
 
       -- C++ launch configuration
