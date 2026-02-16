@@ -11,7 +11,14 @@ return {
         options = {
           mode = "buffers",
           separator_style = "slant",
-          diagnostics = "nvim_lsp",
+          -- FIXED: Changed from "nvim_lsp" to false to avoid segments error
+          -- You can re-enable after updating noice.nvim or bufferline
+          diagnostics = false, -- Temporarily disabled - set to "nvim_lsp" when fixed
+          diagnostics_update_in_insert = false,
+          -- Alternative: use this custom indicator function instead
+          -- diagnostics_indicator = function(count, level, diagnostics_dict, context)
+          --   return "("..count..")"
+          -- end,
           offsets = {
             {
               filetype = "NvimTree",
@@ -20,8 +27,32 @@ return {
               separator = true
             }
           },
-        }
+          -- FIXED: Ensure these are properly typed as lists
+          groups = {
+            options = {
+              toggle_hidden_on_enter = true
+            },
+            items = {}, -- Empty list required
+          },
+          custom_areas = {
+            right = function()
+              -- FIXED: Must return a list/table of segments
+              return {}
+            end,
+          },
+        },
+        -- FIXED: Explicitly define highlights to avoid nil segments
+        highlights = {
+          fill = {
+            bg = {
+              attribute = "bg",
+              highlight = "Normal"
+            }
+          },
+        },
       })
+      
+      -- Keymaps
       vim.keymap.set('n', '<Tab>', '<Cmd>BufferLineCycleNext<CR>', { desc = 'Cycle to next buffer' })
       vim.keymap.set('n', '<S-Tab>', '<Cmd>BufferLineCyclePrev<CR>', { desc = 'Cycle to previous buffer' })
       vim.keymap.set('n', '<leader>x', '<Cmd>bdelete<CR>', { desc = 'Close buffer' })
@@ -46,7 +77,7 @@ return {
     opts = {},
     config = function()
       require("ibl").setup({
-        scope = { enabled = false }, -- catppuccin handles this or separate scope plugin
+        scope = { enabled = false },
       })
     end,
   },
@@ -58,35 +89,33 @@ return {
   },
 
   -- Cmdline and notifications
+  -- NOTE: If bufferline still errors, try disabling noice temporarily
   {
     "folke/noice.nvim",
     event = "VeryLazy",
     opts = {
       lsp = {
-        -- override markdown rendering so that **cmp** and other plugins use Treesitter
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
           ["cmp.entry.get_documentation"] = true,
         },
       },
-      -- you can enable a preset for easier configuration
       presets = {
-        bottom_search = true, -- use a classic bottom cmdline for search
-        command_palette = true, -- position the cmdline and popupmenu together
-        long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = false, -- enables an input dialog for inc-rename.nvim
-        lsp_doc_border = false, -- add a border to hover docs and signature help
+        bottom_search = true,
+        command_palette = true,
+        long_message_to_split = true,
+        inc_rename = false,
+        lsp_doc_border = false,
       },
     },
     dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
       "MunifTanjim/nui.nvim",
       "rcarriga/nvim-notify",
     }
   },
 
-  -- Notifications (standalone config if needed, but Noice uses it)
+  -- Notifications
   {
     "rcarriga/nvim-notify",
     opts = {

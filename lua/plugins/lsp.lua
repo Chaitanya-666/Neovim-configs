@@ -1,6 +1,13 @@
 -- ~/.config/nvim/lua/plugins/lsp.lua
 
 return {
+  -- SchemaStore plugin for JSON/YAML schemas (REQUIRED for jsonls/yamlls)
+  {
+    "b0o/SchemaStore.nvim",
+    lazy = true,
+    version = false, -- last release is way too old
+  },
+
   -- LSP Configuration
   {
     "neovim/nvim-lspconfig",
@@ -9,6 +16,7 @@ return {
       { "williamboman/mason.nvim", config = true },
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
+      "b0o/SchemaStore.nvim", -- ADDED: Required for jsonls/yamlls schemas
     },
     config = function()
       require("mason").setup()
@@ -22,16 +30,49 @@ return {
           "ts_ls",
           "html",
           "cssls",
-          "jsonls",
+          "jsonls",  -- JSON language server (requires schemastore)
+          "yamlls",  -- YAML language server (requires schemastore)
           "bashls",
         },
       })
 
+      -- Default handler for installed servers
       if mason_lspconfig.setup_handlers then
         mason_lspconfig.setup_handlers({
           function(server_name)
             lspconfig[server_name].setup({
               capabilities = capabilities,
+            })
+          end,
+          
+          -- Custom handler for jsonls with SchemaStore
+          ["jsonls"] = function()
+            lspconfig.jsonls.setup({
+              capabilities = capabilities,
+              settings = {
+                json = {
+                  schemas = require("schemastore").json.schemas(),
+                  validate = { enable = true },
+                },
+              },
+            })
+          end,
+          
+          -- Custom handler for yamlls with SchemaStore
+          ["yamlls"] = function()
+            lspconfig.yamlls.setup({
+              capabilities = capabilities,
+              settings = {
+                yaml = {
+                  schemaStore = {
+                    enable = false, -- Disable built-in to use SchemaStore.nvim
+                    url = "",
+                  },
+                  schemas = require("schemastore").yaml.schemas(),
+                  validate = true,
+                  format = { enable = true },
+                },
+              },
             })
           end,
         })
@@ -54,7 +95,31 @@ return {
           },
         },
       })
+      -- ~/.config/nvim/lua/plugins/lsp.lua
+      -- Add this after lspconfig.lua_ls.setup({...})
 
+      -- texlab for LaTeX (installed via pacman, not Mason)
+      lspconfig.texlab.setup({
+	      capabilities = capabilities,
+	      settings = {
+		      texlab = {
+			      build = {
+				      executable = "latexmk",
+				      args = { "-pdf", "-interaction=nonstopmode", "-synctex=1", "%f" },
+				      onSave = true,
+				      forwardSearchAfter = false, -- We use VimTeX for forward search
+			      },
+			      chktex = {
+				      onOpenAndSave = true,
+				      onEdit = true,
+			      },
+			      diagnostics = {
+				      ignoredPatterns = { "Overfull", "Underfull", "specifier changed to" },
+			      },
+			      formatterLineLength = 80,
+		      },
+	      },
+      })
       -- Keymaps
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -78,6 +143,7 @@ return {
       })
     end,
   },
+  
   -- Linting
   {
     "mfussenegger/nvim-lint",
