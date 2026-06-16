@@ -20,7 +20,7 @@ return {
           height = 10,
         },
       },
-      strategies = {
+      interactions = {
         chat = {
           adapter = "llamacpp",
         },
@@ -30,29 +30,40 @@ return {
         agent = {
           adapter = "llamacpp",
         },
+        cmd = {
+          adapter = "llamacpp",
+        },
+        background = {
+          adapter = {
+            name = "llamacpp",
+            model = "Qwen3.5-9B",
+          },
+        },
       },
       adapters = {
-        llamacpp = function()
-          return require("codecompanion.adapters").extend("llamacpp", {
-            env = {
-              url = "http://127.0.0.1:8080", -- Default llama.cpp server port
-            },
-            schema = {
-              model = {
-                default = "Qwen3.5-9B", -- Placeholder name as llama.cpp server usually serves one model at a time
+        http = {
+          llamacpp = function()
+            return require("codecompanion.adapters").extend("openai_compatible", {
+              env = {
+                url = "http://127.0.0.1:8080", -- Default llama.cpp server port
               },
-              num_ctx = {
-                default = 8192, -- 8k is safe for your current VRAM/RAM
+              schema = {
+                model = {
+                  default = "Qwen3.5-9B", -- Placeholder name as llama.cpp server usually serves one model at a time
+                },
+                num_ctx = {
+                  default = 8192, -- 8k is safe for your current VRAM/RAM
+                },
+                seed = {
+                  default = -1,
+                },
+                temperature = {
+                  default = 0, -- Set to 0 for deterministic, consistent responses
+                },
               },
-              seed = {
-                default = -1,
-              },
-              temperature = {
-                default = 0, -- Set to 0 for deterministic, consistent responses
-              },
-            },
-          })
-        end,
+            })
+          end,
+        },
       },
     })
   end,
