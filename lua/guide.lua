@@ -37,6 +37,15 @@ function M.show_guide()
     "  yy, dd, p     - Yank, Delete, Paste",
     "  v + motion    - Visually select, then 'd' or 'y'",
     "  u / <C-r>     - Undo / Redo",
+    "",
+    " AI Agent (CodeCompanion)",
+    "  <Space>a      - AI Actions Menu (Explain, Fix, etc.)",
+    "  <Space>aa     - Toggle AI Chat",
+    "  ga            - Add selection to AI Chat",
+    "  /buffer       - (In Chat) Reference full current file",
+    "",
+    " Terminal (Antigravity)",
+    "  agy           - Launch Antigravity CLI agent",
   }
 
   -- Create a new buffer
