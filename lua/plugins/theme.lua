@@ -11,6 +11,12 @@ return {
         transparent_background = true,
         show_end_of_buffer = false,
         term_colors = true,
+        custom_highlights = function(colors)
+          return {
+            LineNr = { fg = colors.overlay0 },
+            CursorLineNr = { fg = colors.text },
+          }
+        end,
         dim_inactive = {
           enabled = false,
           shade = "dark",

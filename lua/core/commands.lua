@@ -4,13 +4,12 @@
 
 -- Toggle diagnostics
 vim.api.nvim_create_user_command("ToggleDiagnostics", function()
-  local enabled = vim.diagnostic.is_disabled()
-  if enabled then
-    vim.diagnostic.enable()
-    print("Diagnostics enabled")
-  else
-    vim.diagnostic.disable()
+  if vim.diagnostic.is_enabled() then
+    vim.diagnostic.enable(false)
     print("Diagnostics disabled")
+  else
+    vim.diagnostic.enable(true)
+    print("Diagnostics enabled")
   end
 end, {})
 

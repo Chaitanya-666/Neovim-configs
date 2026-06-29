@@ -40,7 +40,10 @@ lazy.setup('plugins', {
   checker = {
     enabled = true,
     notify = false,
-  }
+  },
+  rocks = {
+    hererocks = false,
+  },
 })
 
 -- The line beneath this is called `modeline`. See `:help modeline`

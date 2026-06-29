@@ -100,6 +100,12 @@ return {
           ["vim.lsp.util.stylize_markdown"] = true,
           ["cmp.entry.get_documentation"] = true,
         },
+        progress = {
+          enabled = false, -- Disable LSP progress notification popups
+        },
+      },
+      notify = {
+        enabled = false, -- Disable noice handling of vim.notify (so it falls back to native Neovim echo)
       },
       presets = {
         bottom_search = true,
@@ -111,16 +117,12 @@ return {
     },
     dependencies = {
       "MunifTanjim/nui.nvim",
-      "rcarriga/nvim-notify",
     }
   },
 
   -- Notifications
   {
     "rcarriga/nvim-notify",
-    opts = {
-      timeout = 3000,
-      background_colour = "#000000",
-    },
+    enabled = false,
   },
 }

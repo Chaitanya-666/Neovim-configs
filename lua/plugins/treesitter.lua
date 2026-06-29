@@ -4,7 +4,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "main", -- Explicitly use main branch for v1.0+
+    version = "0.9.3", -- Pin to v0.9.3 to restore ts_utils for CodeCompanion
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     dependencies = {
@@ -12,9 +12,8 @@ return {
       "windwp/nvim-ts-autotag",
     },
     config = function()
-      -- NEW API for nvim-treesitter 1.0+
-      -- The setup function is now much simpler
-      require("nvim-treesitter").setup({
+      -- Use the older configs.setup API for v0.9.3
+      require("nvim-treesitter.configs").setup({
         -- List of parsers to ensure are installed
         ensure_install = {
           "bash",

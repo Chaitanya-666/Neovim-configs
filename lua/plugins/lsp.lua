@@ -11,10 +11,11 @@ return {
   -- LSP Configuration
   {
     "neovim/nvim-lspconfig",
+    version = "1.2.0", -- Pin to avoid Neovim 0.10 deprecation warnings in 3.0.0
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       { "williamboman/mason.nvim", config = true },
-      "williamboman/mason-lspconfig.nvim",
+      { "williamboman/mason-lspconfig.nvim", version = "v1.32.0" },
       "hrsh7th/cmp-nvim-lsp",
       "b0o/SchemaStore.nvim", -- ADDED: Required for jsonls/yamlls schemas
     },
@@ -33,6 +34,8 @@ return {
           "jsonls",  -- JSON language server (requires schemastore)
           "yamlls",  -- YAML language server (requires schemastore)
           "bashls",
+          "lua_ls",
+          "clangd",
         },
       })
 
@@ -75,26 +78,28 @@ return {
               },
             })
           end,
+
+          -- Custom handler for lua_ls
+          ["lua_ls"] = function()
+            lspconfig.lua_ls.setup({
+              capabilities = capabilities,
+              settings = {
+                Lua = {
+                  diagnostics = {
+                    globals = { "vim" },
+                  },
+                  workspace = {
+                    library = {
+                      [vim.fn.expand("$VIMRUNTIME/lua")] = true,
+                      [vim.fn.stdpath("config") .. "/lua"] = true,
+                    },
+                  },
+                },
+              },
+            })
+          end,
         })
       end
-
-      -- Manually setup lua_ls since it's installed via pkg
-      lspconfig.lua_ls.setup({
-        capabilities = capabilities,
-        settings = {
-          Lua = {
-            diagnostics = {
-              globals = { "vim" },
-            },
-            workspace = {
-              library = {
-                [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                [vim.fn.stdpath("config") .. "/lua"] = true,
-              },
-            },
-          },
-        },
-      })
       -- ~/.config/nvim/lua/plugins/lsp.lua
       -- Add this after lspconfig.lua_ls.setup({...})
 
@@ -162,7 +167,7 @@ return {
       vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
         group = lint_augroup,
         callback = function()
-          lint.try_lint()
+          pcall(lint.try_lint)
         end,
       })
     end,
