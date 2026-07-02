@@ -28,7 +28,10 @@ return {
       mason_lspconfig.setup({
         ensure_installed = {
           "pyright",
+          "ruff",      -- Fast python linter/formatter (AI/ML standard)
           "ts_ls",
+          "tailwindcss", -- Fullstack
+          "emmet_ls",    -- Fullstack HTML/JSX
           "html",
           "cssls",
           "jsonls",  -- JSON language server (requires schemastore)
@@ -160,14 +163,31 @@ return {
         typescript = { "eslint_d" },
         javascriptreact = { "eslint_d" },
         typescriptreact = { "eslint_d" },
-        python = { "pylint" },
+        python = { "pylint", "ruff" },
       }
 
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
       vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
         group = lint_augroup,
         callback = function()
-          pcall(lint.try_lint)
+          -- Only run linters if their executable is actually installed
+          local names = lint._resolve_linter_by_ft(vim.bo.filetype)
+          if #names == 0 then return end
+          
+          local linters_to_run = {}
+          for _, name in ipairs(names) do
+            local linter = lint.linters[name]
+            if linter then
+              local cmd = type(linter.cmd) == "function" and linter.cmd() or linter.cmd
+              if vim.fn.executable(cmd) == 1 then
+                table.insert(linters_to_run, name)
+              end
+            end
+          end
+          
+          if #linters_to_run > 0 then
+            lint.try_lint(linters_to_run)
+          end
         end,
       })
     end,

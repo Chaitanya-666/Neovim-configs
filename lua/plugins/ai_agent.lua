@@ -30,7 +30,18 @@ return {
         strategies = {
           chat = { adapter = "llamacpp" },
           inline = { adapter = "llamacpp" },
-          agent = { adapter = "llamacpp" },
+          agent = {
+            adapter = "llamacpp",
+            tools = {
+              "cmd_runner",
+              "editor",
+              "rag",
+              opts = {
+                auto_submit_errors = false,
+                auto_submit_success = true,
+              },
+            },
+          },
         },
         adapters = {
           -- Local llamacpp server configuration

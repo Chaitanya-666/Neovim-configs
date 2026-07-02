@@ -78,6 +78,18 @@ return {
           prompt_prefix = " ",
           selection_caret = " ",
           path_display = { "truncate" },
+          -- Enable deep search (search hidden files and folders, but ignore .git)
+          vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+            "--hidden",
+            "--glob=!.git/",
+          },
           mappings = {
             i = {
               ['<C-k>'] = actions.move_selection_previous,
@@ -86,6 +98,23 @@ return {
               ["<C-d>"] = actions.preview_scrolling_down,
               ["<C-u>"] = actions.preview_scrolling_up,
             },
+          },
+        },
+        pickers = {
+          find_files = {
+            hidden = true,
+            -- If you use fd or rg for find_files, it will now show hidden files
+            find_command = { "rg", "--files", "--hidden", "--glob", "!.git/*" },
+          },
+          live_grep = {
+            additional_args = function()
+              return { "--hidden", "--glob=!.git/" }
+            end,
+          },
+          grep_string = {
+            additional_args = function()
+              return { "--hidden", "--glob=!.git/" }
+            end,
           },
         },
         extensions = {

@@ -14,6 +14,12 @@ return {
     },
   },
 
+  -- clever-f (repeats f/F/t/T jumps using f and F)
+  {
+    "rhysd/clever-f.vim",
+    event = "VeryLazy",
+  },
+
   -- Flash navigation
   {
     "folke/flash.nvim",

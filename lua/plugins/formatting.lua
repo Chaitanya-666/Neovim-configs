@@ -16,10 +16,13 @@ return {
           lua = { "stylua" },
           javascript = { "prettier" },
           typescript = { "prettier" },
+          javascriptreact = { "prettier" },
+          typescriptreact = { "prettier" },
           html = { "prettier" },
           css = { "prettier" },
           json = { "prettier" },
-          python = { "isort", "black" },
+          python = { "isort", "black", "ruff" },
+          cpp = { "clang-format" },
           -- You can add other filetypes here
         },
         -- This is the key part that enables format on save
