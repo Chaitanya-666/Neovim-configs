@@ -52,9 +52,13 @@ return {
                     end
                   end
                   if #system_content > 0 then
+                    local combined_system_prompt = table.concat(system_content, "\n\n")
+                    -- IMPORTANT FIX for local models: Force them to wrap tools in ```xml
+                    combined_system_prompt = combined_system_prompt .. "\n\nCRITICAL: If you use the <tools> XML block to call a tool, you MUST wrap it inside a markdown ```xml codeblock (e.g., ```xml\n<tools>...</tools>\n```). Never output <tools> without the surrounding ```xml backticks!"
+                    
                     table.insert(new_messages, 1, {
                       role = "system",
-                      content = table.concat(system_content, "\n\n")
+                      content = combined_system_prompt
                     })
                   end
                   return { messages = new_messages }
@@ -121,7 +125,7 @@ return {
           suffix = "<|fim_suffix|>",
         },
         debounce_ms = 150,
-        accept_keymap = "<Tab>",
+        accept_keymap = "<Right>",
         dismiss_keymap = "<S-Tab>",
         tls_skip_verify_insecure = false,
         lsp = {
