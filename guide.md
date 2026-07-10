@@ -37,6 +37,16 @@ A plug-n-play AI agent setup featuring a sidepanel chat and inline autocompletio
 - `<Space>b`: Toggle a breakpoint.
 - `<Space>dr`: Toggle the Debugger UI.
 
+## 📓 Jupyter Notebooks (.ipynb)
+Fully featured, robust Jupyter Notebook support using `jupytext`, `molten-nvim`, and `NotebookNavigator`.
+- Opening any `.ipynb` file natively converts it to a standard Python script (`py:percent` format) in memory. When saved, it perfectly updates the notebook.
+- **Cell Structure**: Code cells are separated by standard python comments `# %%`.
+- **Markdown Cells**: You can write markdown cells by defining a cell as `# %% [markdown]` and writing your text inside Python comments.
+- **Execution**: The Jupyter kernel (`nvim-venv`) auto-starts in the background. 
+- `<leader>x`: Run the current cell and move to the next.
+- `<leader>X`: Run the current cell and stay in place.
+- `]h` / `[h`: Jump to the Next / Previous cell.
+
 ## 💡 Pro Tips
 - Type `:help <command>` for native documentation.
 - Use the `/learn` slash command in Antigravity to persist any memory or context about your custom configurations for future sessions!

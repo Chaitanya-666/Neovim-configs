@@ -41,3 +41,13 @@ keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic 
 keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
+-- Molten Notebook
+keymap.set("n", "<leader>ri", "<cmd>MoltenInit nvim-venv<cr>", { desc = "Init Molten" })
+keymap.set("n", "<leader>rc", "<cmd>MoltenReevaluateCell<cr>", { desc = "Run cell" })
+keymap.set("n", "<leader>ra", "<cmd>MoltenReevaluateCell<cr><cmd>MoltenNext<cr>", { desc = "Run cell + advance" })
+keymap.set("n", "<leader>ro", "<cmd>MoltenEnterOutput<cr>", { desc = "Toggle output" })
+keymap.set("n", "<leader>rd", "<cmd>MoltenDelete<cr>", { desc = "Delete cell" })
+keymap.set("n", "<leader>rj", "<cmd>MoltenNext<cr>", { desc = "Next cell" })
+keymap.set("n", "<leader>rk", "<cmd>MoltenPrev<cr>", { desc = "Previous cell" })
+keymap.set("v", "<leader>r", "<cmd>MoltenEvaluateVisual<cr>", { desc = "Run visual selection" })
+
