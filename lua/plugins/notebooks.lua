@@ -17,10 +17,10 @@ return {
         callback = function()
           local venv = os.getenv("VIRTUAL_ENV")
           if venv then
-            vim.cmd("MoltenInit " .. venv .. "/bin/python")
+            vim.cmd("MoltenInit " .. venv .. "/bin/python3")
           else
             -- Fallback: Check if there's a .venv in current directory
-            local local_venv = vim.fn.getcwd() .. "/.venv/bin/python"
+            local local_venv = vim.fn.getcwd() .. "/.venv/bin/python3"
             if vim.fn.executable(local_venv) == 1 then
               vim.cmd("MoltenInit " .. local_venv)
             else
