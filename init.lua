@@ -42,7 +42,7 @@ lazy.setup('plugins', {
     notify = false,
   },
   rocks = {
-    hererocks = false,
+    hererocks = true,
   },
 })
 
