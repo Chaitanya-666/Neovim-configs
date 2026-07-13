@@ -1,72 +1,6 @@
 -- ~/.config/nvim/lua/plugins/notebooks.lua
 
 return {
-  {
-    "benlubas/molten-nvim",
-    version = "^1.0.0",
-    dependencies = { "3rd/image.nvim" },
-    lazy = false,
-    build = ":UpdateRemotePlugins",
-    config = function()
-      vim.g.molten_auto_open_output = false
-      vim.g.molten_image_provider = "image.nvim"
-      vim.g.molten_output_win_max_height = 20
-      
-      local function get_venv_kernel()
-        local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
-        local cwd = vim.fn.getcwd()
-        
-        local expected_python = nil
-        if venv then
-          expected_python = venv .. "/bin/python"
-        elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
-          expected_python = cwd .. "/.venv/bin/python"
-        elseif vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
-          expected_python = cwd .. "/venv/bin/python"
-        end
-        
-        if not expected_python then
-          return "python3"
-        end
-
-        if vim.fn.executable("jupyter") == 1 then
-          local output = vim.fn.system({"jupyter", "kernelspec", "list", "--json"})
-          if vim.v.shell_error == 0 and output ~= "" then
-            local ok, kernels = pcall(vim.fn.json_decode, output)
-            if ok and kernels and kernels.kernelspecs then
-              for name, spec in pairs(kernels.kernelspecs) do
-                if spec.spec and spec.spec.argv and spec.spec.argv[1] then
-                  if spec.spec.argv[1] == expected_python then
-                    return name
-                  end
-                end
-              end
-            end
-          end
-        end
-        
-        return "python3"
-      end
-
-      -- Auto-init on python/markdown files that act as notebooks
-      vim.api.nvim_create_autocmd("BufEnter", {
-        pattern = { "*.ipynb", "*.py", "*.md" },
-        callback = function(e)
-          if vim.api.nvim_get_option_value("filetype", { buf = e.buf }) == "quarto" then
-            return
-          end
-          vim.defer_fn(function()
-            local status, molten = pcall(require, "molten")
-            if status and molten and not molten.is_initialized() then
-              local kernel = get_venv_kernel()
-              vim.cmd("MoltenInit " .. kernel)
-            end
-          end, 100)
-        end,
-      })
-    end,
-  },
-
   -- Notebook Navigator: Auto-detects cells, executes them, and navigates
   {
     "GCBallesteros/NotebookNavigator.nvim",
@@ -78,15 +12,31 @@ return {
     },
     dependencies = {
       "echasnovski/mini.comment",
-      "hkupty/iron.nvim", -- fallback repl if molten isn't used
+      {
+        "hkupty/iron.nvim", -- Use Iron.nvim for REPL
+        config = function()
+          local iron = require("iron.core")
+          iron.setup({
+            config = {
+              scratch_repl = true,
+              repl_definition = {
+                python = {
+                  command = { "ipython", "--no-autoindent" },
+                  format = require("iron.fts.common").bracketed_paste,
+                },
+              },
+              repl_open_cmd = require("iron.view").split.vertical.botright(50),
+            },
+          })
+        end,
+      },
       "akinsho/toggleterm.nvim",
-      "benlubas/molten-nvim",
     },
     event = "VeryLazy",
     config = function()
       local nn = require("notebook-navigator")
       nn.setup({
-        repl_provider = "molten", -- use molten for REPL instead of iron/toggleterm
+        repl_provider = "iron", -- use iron for REPL instead of molten
         setup_hydra = false,
       })
     end,
