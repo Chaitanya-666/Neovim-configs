@@ -67,7 +67,20 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Setup Python3 provider for remote plugins (e.g., Molten)
-vim.g.python3_host_prog = vim.fn.expand("~/.local/share/nvim/venv/bin/python3")
+local function get_python_path()
+  local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
+  if venv then
+    return venv .. "/bin/python"
+  end
+  local cwd = vim.fn.getcwd()
+  if vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+    return cwd .. "/.venv/bin/python"
+  elseif vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
+    return cwd .. "/venv/bin/python"
+  end
+  return vim.fn.expand("~/.local/share/nvim/venv/bin/python3")
+end
+vim.g.python3_host_prog = get_python_path()
 
 -- Disable unused legacy providers for faster startup
 vim.g.loaded_node_provider = 0

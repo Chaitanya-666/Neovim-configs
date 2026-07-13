@@ -1,7 +1,6 @@
 -- ~/.config/nvim/lua/plugins/notebooks.lua
 
 return {
-  -- Molten: Run code cells via Jupyter kernel (native, no external server)
   {
     "benlubas/molten-nvim",
     version = "^1.0.0",
@@ -13,6 +12,42 @@ return {
       vim.g.molten_image_provider = "image.nvim"
       vim.g.molten_output_win_max_height = 20
       
+      local function get_venv_kernel()
+        local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
+        local cwd = vim.fn.getcwd()
+        
+        local expected_python = nil
+        if venv then
+          expected_python = venv .. "/bin/python"
+        elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+          expected_python = cwd .. "/.venv/bin/python"
+        elseif vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
+          expected_python = cwd .. "/venv/bin/python"
+        end
+        
+        if not expected_python then
+          return "python3"
+        end
+
+        if vim.fn.executable("jupyter") == 1 then
+          local output = vim.fn.system({"jupyter", "kernelspec", "list", "--json"})
+          if vim.v.shell_error == 0 and output ~= "" then
+            local ok, kernels = pcall(vim.fn.json_decode, output)
+            if ok and kernels and kernels.kernelspecs then
+              for name, spec in pairs(kernels.kernelspecs) do
+                if spec.spec and spec.spec.argv and spec.spec.argv[1] then
+                  if spec.spec.argv[1] == expected_python then
+                    return name
+                  end
+                end
+              end
+            end
+          end
+        end
+        
+        return "python3"
+      end
+
       -- Auto-init on python/markdown files that act as notebooks
       vim.api.nvim_create_autocmd("BufEnter", {
         pattern = { "*.ipynb", "*.py", "*.md" },
@@ -23,7 +58,8 @@ return {
           vim.defer_fn(function()
             local status, molten = pcall(require, "molten")
             if status and molten and not molten.is_initialized() then
-              vim.cmd("MoltenInit nvim-venv")
+              local kernel = get_venv_kernel()
+              vim.cmd("MoltenInit " .. kernel)
             end
           end, 100)
         end,
