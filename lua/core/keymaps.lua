@@ -38,8 +38,27 @@ keymap.set("v", ">", ">gv")
 -- Diagnostic keymaps
 keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
+keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = 'Open line diagnostic float' })
+keymap.set('n', '<leader>cd', vim.diagnostic.open_float, { desc = 'Line diagnostic float' })
 keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+
+-- Smart UI & IDE Toggles
+keymap.set('n', '<leader>uh', function()
+  if vim.lsp.inlay_hint then
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+    print("Inlay hints: " .. (vim.lsp.inlay_hint.is_enabled() and "ENABLED" or "DISABLED"))
+  end
+end, { desc = "Toggle Inlay Hints" })
+
+keymap.set('n', '<leader>ub', function()
+  local ok, gitsigns = pcall(require, "gitsigns")
+  if ok then gitsigns.toggle_current_line_blame() end
+end, { desc = "Toggle Git Line Blame" })
+
+keymap.set('n', '<leader>uw', function()
+  vim.wo.wrap = not vim.wo.wrap
+  print("Word wrap: " .. (vim.wo.wrap and "ENABLED" or "DISABLED"))
+end, { desc = "Toggle Word Wrap" })
 
 -- Molten Notebook
 keymap.set("n", "<leader>ri", "<cmd>MoltenInit nvim-venv<cr>", { desc = "Init Molten" })
