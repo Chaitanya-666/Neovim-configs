@@ -128,6 +128,12 @@ return {
 		      },
 	      },
       })
+      
+      -- dartls for Flutter/Dart (installed via Flutter SDK, not Mason)
+      lspconfig.dartls.setup({
+        capabilities = capabilities,
+      })
+      
       -- Keymaps
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),

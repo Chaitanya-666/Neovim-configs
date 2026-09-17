@@ -1,9 +1,9 @@
 return {
-  -- 1. CodeCompanion (Sidepanel Chat & Inline Actions)
-  -- Supports any Cloud API (OpenAI, Anthropic, Gemini) or Local (Llama.cpp / Ollama)
+  -- CodeCompanion: On-demand AI Chat, Inline Code Assistant, and Workflows
+  -- Cleanly integrates with Local (Ollama, llama.cpp) and Online (Claude, GPT, Gemini, OpenRouter)
   {
     "olimorris/codecompanion.nvim",
-    version = "9.12.4", -- Pin to last version that supports Neovim 0.10.0
+    version = "9.12.4", -- Pin to version compatible with Neovim 0.10.0
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
@@ -12,26 +12,52 @@ return {
     },
     cmd = { "CodeCompanion", "CodeCompanionChat", "CodeCompanionCmd", "CodeCompanionActions" },
     keys = {
-      { "<leader>ae", "<cmd>CodeCompanionActions<cr>", mode = { "n", "v" }, desc = "AI Actions (Explain, etc)" },
-      { "<leader>aa", "<cmd>CodeCompanionChat Toggle<cr>", mode = { "n", "v" }, desc = "Toggle AI Chat Sidepanel" },
-      { "ga", "<cmd>CodeCompanionChat Add<cr>", mode = "v", desc = "Add code to AI Chat" },
+      { "<leader>aa", "<cmd>CodeCompanionChat Toggle<cr>", mode = { "n", "v" }, desc = "AI: Toggle Chat Sidepanel" },
+      { "<leader>ac", "<cmd>CodeCompanion<cr>",             mode = { "n", "v" }, desc = "AI: Inline Code Assistant" },
+      { "<leader>ae", "<cmd>CodeCompanion /explain<cr>",    mode = "v",          desc = "AI: Explain Code" },
+      { "<leader>ap", "<cmd>CodeCompanionActions<cr>",     mode = { "n", "v" }, desc = "AI: Prompt Actions Picker" },
+      { "ga",         "<cmd>CodeCompanionChat Add<cr>",    mode = "v",          desc = "AI: Add selection to Chat" },
     },
     config = function()
+      -- Helper to detect which adapter to default to based on available API keys / local servers
+      local default_adapter = "ollama"
+      if os.getenv("ANTHROPIC_API_KEY") then
+        default_adapter = "anthropic"
+      elseif os.getenv("OPENAI_API_KEY") then
+        default_adapter = "openai"
+      elseif os.getenv("GEMINI_API_KEY") then
+        default_adapter = "gemini"
+      end
+
       require("codecompanion").setup({
         display = {
           chat = {
             window = {
-              layout = "vertical", -- Renders on the side, like GitHub Copilot
-              width = 40,
+              layout = "vertical",
+              width = 42,
+              border = "rounded",
             },
           },
+          action_palette = {
+            width = 95,
+            height = 16,
+            prompt = "Prompt Actions  ",
+            provider = "telescope",
+          },
         },
-        -- Set to "llamacpp" to use local, or change to "openai", "anthropic", or "gemini" for cloud APIs
         strategies = {
-          chat = { adapter = "llamacpp" },
-          inline = { adapter = "llamacpp" },
+          chat = {
+            adapter = default_adapter,
+            roles = {
+              llm = "CodeCompanion",
+              user = "You",
+            },
+          },
+          inline = {
+            adapter = default_adapter,
+          },
           agent = {
-            adapter = "llamacpp",
+            adapter = default_adapter,
             tools = {
               "cmd_runner",
               "editor",
@@ -44,43 +70,36 @@ return {
           },
         },
         adapters = {
-          -- Local llamacpp server configuration
-          llamacpp = function()
-            return require("codecompanion.adapters").extend("openai_compatible", {
+          -- 1. Local: Ollama (Recommended local provider)
+          ollama = function()
+            return require("codecompanion.adapters").extend("ollama", {
               env = {
-                url = "http://127.0.0.1:8080",
-                chat_url = "/v1/chat/completions",
-              },
-              handlers = {
-                form_messages = function(self, messages)
-                  local system_content = {}
-                  local new_messages = {}
-                  for _, msg in ipairs(messages) do
-                    if msg.role == "system" then
-                      table.insert(system_content, msg.content)
-                    else
-                      table.insert(new_messages, msg)
-                    end
-                  end
-                  if #system_content > 0 then
-                    local combined_system_prompt = table.concat(system_content, "\n\n")
-                    -- IMPORTANT FIX for local models: Force them to wrap tools in ```xml
-                    combined_system_prompt = combined_system_prompt .. "\n\nCRITICAL: If you use the <tools> XML block to call a tool, you MUST wrap it inside a markdown ```xml codeblock (e.g., ```xml\n<tools>...</tools>\n```). Never output <tools> without the surrounding ```xml backticks!"
-                    
-                    table.insert(new_messages, 1, {
-                      role = "system",
-                      content = combined_system_prompt
-                    })
-                  end
-                  return { messages = new_messages }
-                end,
+                url = os.getenv("OLLAMA_HOST") or "http://127.0.0.1:11434",
               },
               schema = {
                 model = {
-                  default = "ornith-1.0-9b-uncensored-Q4_K_M.gguf",
+                  default = "qwen2.5-coder:latest",
                 },
                 num_ctx = {
-                  default = 262144,
+                  default = 32768,
+                },
+              },
+            })
+          end,
+
+          -- 2. Local: llama.cpp server
+          llamacpp = function()
+            return require("codecompanion.adapters").extend("openai_compatible", {
+              env = {
+                url = os.getenv("LLAMACPP_URL") or "http://127.0.0.1:8000",
+                chat_url = "/v1/chat/completions",
+              },
+              schema = {
+                model = {
+                  default = "ternary-bonsai",
+                },
+                num_ctx = {
+                  default = 65536,
                 },
                 temperature = {
                   default = 0.6,
@@ -88,68 +107,66 @@ return {
               },
             })
           end,
-          -- Cloud API Example (OpenAI):
-          -- To use this, change `adapter = "openai"` in the strategies above, and set the OPENAI_API_KEY env var
-          openai = function()
-            return require("codecompanion.adapters").extend("openai", {
-              env = {
-                api_key = os.getenv("OPENAI_API_KEY"),
-              },
-            })
-          end,
-          -- Cloud API Example (Anthropic):
+
+          -- 3. Online: Anthropic Claude (Claude 3.5 Sonnet)
           anthropic = function()
             return require("codecompanion.adapters").extend("anthropic", {
               env = {
                 api_key = os.getenv("ANTHROPIC_API_KEY"),
               },
+              schema = {
+                model = {
+                  default = "claude-3-5-sonnet-latest",
+                },
+              },
+            })
+          end,
+
+          -- 4. Online: OpenAI (GPT-4o)
+          openai = function()
+            return require("codecompanion.adapters").extend("openai", {
+              env = {
+                api_key = os.getenv("OPENAI_API_KEY"),
+              },
+              schema = {
+                model = {
+                  default = "gpt-4o",
+                },
+              },
+            })
+          end,
+
+          -- 5. Online: Google Gemini
+          gemini = function()
+            return require("codecompanion.adapters").extend("gemini", {
+              env = {
+                api_key = os.getenv("GEMINI_API_KEY"),
+              },
+              schema = {
+                model = {
+                  default = "gemini-1.5-pro-latest",
+                },
+              },
+            })
+          end,
+
+          -- 6. Online: OpenRouter (Unified API for any cloud model)
+          openrouter = function()
+            return require("codecompanion.adapters").extend("openai_compatible", {
+              env = {
+                url = "https://openrouter.ai/api",
+                chat_url = "/v1/chat/completions",
+                api_key = os.getenv("OPENROUTER_API_KEY"),
+              },
+              schema = {
+                model = {
+                  default = "anthropic/claude-3.5-sonnet",
+                },
+              },
             })
           end,
         },
       })
-    end,
-  },
-
-  -- 2. LLM.nvim (Ghost Text Autocompletion as you type)
-  -- Uses your custom model to predict what you're typing next, just like Copilot
-  {
-    "huggingface/llm.nvim",
-    event = "InsertEnter",
-    config = function()
-      local llm = require("llm")
-      
-      llm.setup({
-        -- Set to "openai" for local llama.cpp compatibility
-        backend = "openai", 
-        url = "http://127.0.0.1:8080/v1/completions", -- Route to OpenAI-compatible endpoint
-        model = "ornith-1.0-9b-uncensored-Q4_K_M.gguf", 
-        request_body = {
-          -- Additional request params if your model needs them for FIM (Fill-In-Middle)
-          temperature = 0.6,
-          top_p = 0.95,
-        },
-        -- The FIM tokens depend on your model. You may need to tweak these if Qwen FIM fails.
-        fim = {
-          enabled = true,
-          prefix = "<|fim_prefix|>",
-          middle = "<|fim_middle|>",
-          suffix = "<|fim_suffix|>",
-        },
-        debounce_ms = 150,
-        accept_keymap = "<Right>",
-        dismiss_keymap = "<S-Tab>",
-        tls_skip_verify_insecure = false,
-        lsp = {
-          bin_path = nil,
-          host = nil,
-          port = nil,
-          cmd_env = nil, -- or { LLM_LOG_LEVEL = "DEBUG" }
-          version = "0.5.3",
-        },
-      })
-      
-      -- Easy toggle to disable/enable AI autocompletions (ghost text)
-      vim.keymap.set("n", "<leader>ct", "<cmd>LLMToggleAutoSuggest<cr>", { desc = "Toggle AI Autocompletion" })
     end,
   },
 }

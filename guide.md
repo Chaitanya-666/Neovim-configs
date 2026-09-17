@@ -19,11 +19,12 @@ Powered by `mason.nvim`, `nvim-lspconfig`, and `nvim-cmp`.
 - Use `<Tab>` and `<S-Tab>` to navigate the completion menu.
 - `K` for hover documentation, `gd` for go-to-definition, `<leader>rn` to rename variables.
 
-## 🤖 AI Agent
-A plug-n-play AI agent setup featuring a sidepanel chat and inline autocompletion.
-- `<Space>ct`: Toggle inline AI autocompletions on or off.
-- `<Space>aa`: Toggle the AI Chat sidepanel.
-- `<Space>ae`: Ask the AI to explain the selected code.
+## 🤖 AI Assistant (Local + Online)
+On-demand AI workflows powered by CodeCompanion. Zero intrusive ghost text autocompletions.
+- `<Space>aa`: Toggle the AI Chat sidepanel (supports Ollama, llama.cpp, Claude, GPT-4o, Gemini, OpenRouter).
+- `<Space>ac`: Inline Code Assistant (prompt AI directly on code).
+- `<Space>ae`: Ask the AI to explain selected code.
+- `<Space>ap`: AI Prompt Actions Picker (tests, refactoring, fixing).
 
 ## 🔭 Telescope (Fuzzy Finder)
 - `<Space>ff`: Find Files in the project.
