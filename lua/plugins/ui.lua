@@ -11,14 +11,11 @@ return {
         options = {
           mode = "buffers",
           separator_style = "slant",
-          -- FIXED: Changed from "nvim_lsp" to false to avoid segments error
-          -- You can re-enable after updating noice.nvim or bufferline
-          diagnostics = false, -- Temporarily disabled - set to "nvim_lsp" when fixed
-          diagnostics_update_in_insert = false,
-          -- Alternative: use this custom indicator function instead
-          -- diagnostics_indicator = function(count, level, diagnostics_dict, context)
-          --   return "("..count..")"
-          -- end,
+          diagnostics = "nvim_lsp",
+          diagnostics_indicator = function(count, level)
+            local icon = level:match("error") and " " or " "
+            return " " .. icon .. count
+          end,
           offsets = {
             {
               filetype = "NvimTree",
@@ -27,28 +24,10 @@ return {
               separator = true
             }
           },
-          -- FIXED: Ensure these are properly typed as lists
-          groups = {
-            options = {
-              toggle_hidden_on_enter = true
-            },
-            items = {}, -- Empty list required
-          },
-          custom_areas = {
-            right = function()
-              -- FIXED: Must return a list/table of segments
-              return {}
-            end,
-          },
-        },
-        -- FIXED: Explicitly define highlights to avoid nil segments
-        highlights = {
-          fill = {
-            bg = {
-              attribute = "bg",
-              highlight = "Normal"
-            }
-          },
+          show_buffer_close_icons = true,
+          show_close_icon = false,
+          color_icons = true,
+          modified_icon = "●",
         },
       })
       
@@ -59,27 +38,41 @@ return {
     end,
   },
 
-  -- Key binding help
+  -- Key binding help with registered group names
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    init = function()
-      vim.o.timeout = true
-      vim.o.timeoutlen = 300
-    end,
-    opts = {}
+    opts = {
+      spec = {
+        { "<leader>a", group = "AI Assistant" },
+        { "<leader>c", group = "Code & Diagnostics" },
+        { "<leader>d", group = "Debugger" },
+        { "<leader>f", group = "Find & Telescope" },
+        { "<leader>g", group = "Git" },
+        { "<leader>q", group = "Session & Quit" },
+        { "<leader>r", group = "Notebook / Run" },
+        { "<leader>u", group = "UI & Smart Toggles" },
+        { "<leader>x", group = "Trouble Diagnostics" },
+      },
+    },
   },
 
-  -- Indent guides
+  -- Indent guides with active scope highlighting
   {
     "lukas-reineke/indent-blankline.nvim",
     main = "ibl",
-    opts = {},
-    config = function()
-      require("ibl").setup({
-        scope = { enabled = false },
-      })
-    end,
+    opts = {
+      indent = {
+        char = "│",
+        tab_char = "│",
+      },
+      scope = {
+        enabled = true,
+        show_start = true,
+        show_end = false,
+        highlight = { "Keyword", "Function" },
+      },
+    },
   },
 
   -- Better UI for vim.ui.select and input
@@ -88,8 +81,7 @@ return {
     event = "VeryLazy",
   },
 
-  -- Cmdline and notifications
-  -- NOTE: If bufferline still errors, try disabling noice temporarily
+  -- Sleek Cmdline, Floating Palette, and Notifications
   {
     "folke/noice.nvim",
     event = "VeryLazy",
@@ -101,28 +93,36 @@ return {
           ["cmp.entry.get_documentation"] = true,
         },
         progress = {
-          enabled = false, -- Disable LSP progress notification popups
+          enabled = true,
+          view = "mini",
         },
       },
       notify = {
-        enabled = false, -- Disable noice handling of vim.notify (so it falls back to native Neovim echo)
+        enabled = true,
       },
       presets = {
         bottom_search = true,
         command_palette = true,
         long_message_to_split = true,
-        inc_rename = false,
-        lsp_doc_border = false,
+        inc_rename = true,
+        lsp_doc_border = true,
       },
     },
     dependencies = {
       "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
     }
   },
 
-  -- Notifications
+  -- Floating Notifications with smooth fade
   {
     "rcarriga/nvim-notify",
-    enabled = false,
+    event = "VeryLazy",
+    opts = {
+      timeout = 3000,
+      render = "wrapped-compact",
+      stages = "fade",
+      top_down = false,
+    },
   },
 }
