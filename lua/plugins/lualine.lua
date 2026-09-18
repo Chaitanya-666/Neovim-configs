@@ -25,7 +25,7 @@ return {
 
     lualine.setup({
       options = {
-        theme = "catppuccin",
+        theme = "auto",
         globalstatus = true,
         disabled_filetypes = { statusline = { "alpha", "dashboard" } },
         component_separators = "",

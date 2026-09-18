@@ -75,7 +75,11 @@ return {
           which_key = true,
         },
       })
-      vim.cmd.colorscheme "catppuccin"
+      -- Auto-detect Celestia Shell theme, fallback to Catppuccin
+      local ok_caelestia = pcall(vim.cmd.colorscheme, "caelestia")
+      if not ok_caelestia then
+        vim.cmd.colorscheme "catppuccin"
+      end
     end,
   },
 }

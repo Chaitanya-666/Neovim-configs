@@ -8,9 +8,22 @@ Welcome to your completely configured, crisp Neovim setup! This manual explains 
 - `lua/plugins/`: Contains configurations for all installed plugins.
 
 ## 🎨 Theme & Aesthetics
-- **Catppuccin Macchiato**: A crisp, dark, and vibrant theme.
-- **Line Numbers**: Active line numbers (`CursorLineNr`) are highlighted in **white**, while inactive line numbers (`LineNr`) are a subtle **gray**.
-- **Transparent Background**: Enabled by default for a modern look if your terminal supports it.
+- **Caelestia Dynamic Shell Theme**: Automatically syncs your Neovim colors with your Hyprland wallpaper and Caelestia shell palette in real time!
+- **Catppuccin Macchiato**: Fallback high-contrast theme when Caelestia palette is unavailable.
+- **Transparent Background**: Fully enabled by default for a modern glassy Hyprland aesthetic.
+- **Riced UI**: Bubble pill statusline (`lualine`), active code block indent scope (`indent-blankline`), floating command palette & notifications (`noice` + `notify`), and cyberpunk start dashboard (`alpha`).
+
+## 🧠 Smart IDE & Code Navigation
+- `<Space>xx`: Open Workspace Diagnostics panel (`trouble.nvim`).
+- `<Space>co`: Toggle Symbol Tree Outline sidebar (`aerial.nvim`) for quick jumping across functions, classes, and methods.
+- `<Space>qs`: Restore previous IDE workspace session (`persistence.nvim`).
+- `-` or `<Space>o`: Open buffer-like File Manager (`oil.nvim`) — rename, create, and delete files like text.
+- `<Space>e`: Toggle traditional sidebar file explorer (`nvim-tree`).
+- `gl` or `<Space>cd`: Open floating diagnostic message at cursor.
+- `<Space>uh`: Toggle LSP Inlay Hints (Neovim 0.10+ native).
+- `<Space>ub`: Toggle Git line blame inline.
+- `<Space>uw`: Toggle word wrap.
+- Sticky code header shows current function/class at the top of the window while scrolling (`treesitter-context`).
 
 ## 🧠 LSP & Autocompletion
 Powered by `mason.nvim`, `nvim-lspconfig`, and `nvim-cmp`.
