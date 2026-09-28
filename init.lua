@@ -1,5 +1,19 @@
 -- ~/.config/nvim/init.lua
 
+-- Neovim 0.10 compatibility polyfill for plugins using Neovim 0.11+ vim.validate signature
+local orig_validate = vim.validate
+vim.validate = function(...)
+  local nargs = select("#", ...)
+  if nargs == 1 and type(...) == "table" then
+    return orig_validate(...)
+  end
+  local name, val, validator, optional = ...
+  if optional and val == nil then
+    return true
+  end
+  return orig_validate({ [name] = { val, validator, optional } })
+end
+
 -- Load core modules
 require("core.options")
 require("core.keymaps")
@@ -42,7 +56,7 @@ lazy.setup('plugins', {
     notify = false,
   },
   rocks = {
-    hererocks = true,
+    enabled = false,
   },
 })
 

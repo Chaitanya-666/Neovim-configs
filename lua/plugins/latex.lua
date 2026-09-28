@@ -4,7 +4,7 @@
 return {
   {
     "lervag/vimtex",
-    lazy = false,
+    ft = { "tex", "plaintex", "bib" },
     config = function()
       -- PDF viewer: Zathura with sync support
       vim.g.vimtex_view_method = "zathura"
